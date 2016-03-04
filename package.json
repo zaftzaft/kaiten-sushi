@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Kaiten-sushi in your terminal",
   "main": "index.js",
+  "keywords": [
+    "sushi", "ansi"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,5 +15,15 @@
     "ansi-escapes": "1.1.1",
     "eastasianwidth": "0.1.1",
     "minimist": "1.2.0"
-  }
+  },
+  "files": [
+    "index.js"
+  ],
+  "bin": {
+    "kaiten-sushi": "./index.js"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "repository": "https://github.com/zaftzaft/kaiten-sushi"
 }
