@@ -1,0 +1,16 @@
+{
+  "name": "kaiten-sushi",
+  "version": "0.0.1",
+  "description": "Kaiten-sushi in your terminal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zaftzaft",
+  "license": "MIT",
+  "dependencies": {
+    "ansi-escapes": "1.1.1",
+    "eastasianwidth": "0.1.1",
+    "minimist": "1.2.0"
+  }
+}
