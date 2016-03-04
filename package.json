@@ -1,6 +1,6 @@
 {
   "name": "kaiten-sushi",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Kaiten-sushi in your terminal",
   "main": "index.js",
   "keywords": [
