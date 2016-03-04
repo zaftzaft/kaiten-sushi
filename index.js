@@ -11,6 +11,9 @@ const argv     = require("minimist")(process.argv.slice(2), {
     h: "help",
     r: "rainbow",
     i: "interval"
+  },
+  default: {
+    interval: 100
   }
 });
 
@@ -90,7 +93,7 @@ const main = () => {
     process.stdout.write(ansi.cursorUp(h + 2));
     kaiten(sushi);
 
-    let interval = argv.interval || 100;
+    let interval = +argv.interval;
     if(interval < 10){
       interval = 10;
     }
