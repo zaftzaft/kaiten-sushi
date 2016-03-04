@@ -90,7 +90,12 @@ const main = () => {
     process.stdout.write(ansi.cursorUp(h + 2));
     kaiten(sushi);
 
-    setTimeout(frame, argv.interval || 100);
+    let interval = argv.interval || 100;
+    if(interval < 10){
+      interval = 10;
+    }
+
+    setTimeout(frame, interval);
   };
 
   let text = "" + (argv._[0] || "寿司sushi🍣🐟");
