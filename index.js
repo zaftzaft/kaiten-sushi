@@ -32,37 +32,42 @@ const main = () => {
 
   const kaiten = (neta) => {
 
-    [...neta].forEach((c) => {
-      let l = eaw.length(c);
+    try{
 
-      // Ascii
-      if(l === 1){
-        c += " ";
-      }
-      // Emoji
-      else if(l === 2 && c.length === 2){
-        c += " ";
-      }
+      [...neta].forEach((c) => {
+        let l = eaw.length(c);
 
-      if(argv["256"]){
-        conveyor.unshift(`\x1b[38;5;${
-          255 < c256 ? (c256 = 0) : ++c256
-        }m${c}\x1b[39m`);
-      }
-      else if(argv.rainbow){
-        conveyor.unshift(`\x1b[${
-          rainbow[
-            (rainbow.length <= ++rainbowPos) ? (rainbowPos = 0) : rainbowPos
-          ]
-        }m${c}\x1b[39m`);
-      }
-      else{
-        conveyor.unshift(c);
-      }
+        // Ascii
+        if(l === 1){
+          c += " ";
+        }
+        // Emoji
+        else if(l === 2 && c.length === 2){
+          c += " ";
+        }
 
-    });
+        if(argv["256"]){
+          conveyor.unshift(`\x1b[38;5;${
+            255 < c256 ? (c256 = 0) : ++c256
+          }m${c}\x1b[39m`);
+        }
+        else if(argv.rainbow){
+          conveyor.unshift(`\x1b[${
+            rainbow[
+              (rainbow.length <= ++rainbowPos) ? (rainbowPos = 0) : rainbowPos
+            ]
+          }m${c}\x1b[39m`);
+        }
+        else{
+          conveyor.unshift(c);
+        }
 
-    ((Math.random() * 3|0) < 1)&& conveyor.unshift(null);
+      });
+
+    }catch(e){
+      conveyor.unshift(null);
+    }
+
 
     process.stdout.write(pad);
     for(let i = 0;i < w;i++){
@@ -92,7 +97,7 @@ const main = () => {
 
   const frame = () => {
     process.stdout.write(ansi.cursorUp(h + 2));
-    kaiten(sushi);
+    kaiten(((Math.random() * 3|0) < 1) ? null : sushi);
 
     let interval = +argv.interval;
     if(interval < 10){
