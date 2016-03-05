@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 "use strict";
 
-const punycode = require("punycode");
 const readline = require("readline");
 const ansi     = require("ansi-escapes");
 const eaw      = require("eastasianwidth");
@@ -31,8 +30,8 @@ const main = () => {
   let c256 = 0;
 
   const kaiten = (neta) => {
-    punycode.ucs2.decode(neta).forEach((code) => {
-      let c = punycode.ucs2.encode([code]);
+
+    [...neta].forEach((c) => {
       let l = eaw.length(c);
 
       // Ascii
@@ -44,21 +43,22 @@ const main = () => {
         c += " ";
       }
 
-
       if(argv["256"]){
-        let n = 255 < c256 ? (c256 = 0) : c256++;
-        conveyor.unshift("\x1b[38;5;" + n + "m" + c + "\x1b[39m");
+        conveyor.unshift(`\x1b[38;5;${
+          255 < c256 ? (c256 = 0) : ++c256
+        }m${c}\x1b[39m`);
       }
       else if(argv.rainbow){
-        let n = rainbow[
-          (rainbow.length <= ++rainbowPos) ? (rainbowPos = 0) : rainbowPos
-        ];
-
-        conveyor.unshift("\x1b[" + n + "m" + c + "\x1b[39m");
+        conveyor.unshift(`\x1b[${
+          rainbow[
+            (rainbow.length <= ++rainbowPos) ? (rainbowPos = 0) : rainbowPos
+          ]
+        }m${c}\x1b[39m`);
       }
       else{
         conveyor.unshift(c);
       }
+
     });
 
     ((Math.random() * 3|0) < 1)&& conveyor.unshift(null);
