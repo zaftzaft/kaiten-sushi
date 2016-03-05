@@ -9,7 +9,8 @@ const argv     = require("minimist")(process.argv.slice(2), {
     l: "line",
     h: "help",
     r: "rainbow",
-    i: "interval"
+    i: "interval",
+    w: "width"
   },
   default: {
     interval: 100
@@ -18,7 +19,7 @@ const argv     = require("minimist")(process.argv.slice(2), {
 
 
 const main = () => {
-  const w = (process.stdout.columns / 2|0) - 2;
+  const w = argv.width || ((process.stdout.columns / 2|0) - 2);
   const h = argv.line || 8;
   const sushi = "🍣";
   const pad = "  ";
@@ -114,6 +115,7 @@ if(argv.help){
 
     Options:
       -l, --line <height>:
+      -w, --width <width>:
       -i, --interval <msec>:
       -r, --rainbow: rainbow
       --256:
