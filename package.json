@@ -19,7 +19,8 @@
     "eastasianwidth": "0.1.1"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "./bin/kaiten-sushi.js"
   ],
   "bin": {
     "kaiten-sushi": "./bin/kaiten-sushi.js"
