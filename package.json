@@ -20,7 +20,7 @@
   },
   "files": [
     "index.js",
-    "./bin/kaiten-sushi.js"
+    "./bin"
   ],
   "bin": {
     "kaiten-sushi": "./bin/kaiten-sushi.js"
