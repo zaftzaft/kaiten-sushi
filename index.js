@@ -1,6 +1,6 @@
 "use strict";
 
-const eaw      = require("eastasianwidth");
+const eaw  = require("eastasianwidth");
 const c256 = require("ansi-256-colors");
 
 // TODO banner/message

@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 "use strict";
 
-const readline = require("readline");
-const ansi     = require("ansi-escapes");
-const KaitenSushi = require("../");
+const readline       = require("readline");
+const ansi           = require("ansi-escapes");
 const ArgumentParser = require("argparse").ArgumentParser;
+const KaitenSushi    = require("../");
 
 
 const main = (options) => {
   const sushi = new KaitenSushi({
-    width: options.width,
-    height: options.line,
+    width:   options.width,
+    height:  options.line,
     rainbow: options.rainbow,
-    neta: options.neta,
-    c256: options["256"]
+    neta:    options.neta,
+    c256:    options["256"]
   });
 
 
