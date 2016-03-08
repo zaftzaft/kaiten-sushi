@@ -1,37 +1,60 @@
-#!/usr/bin/env node
 "use strict";
 
-const readline = require("readline");
-const ansi     = require("ansi-escapes");
 const eaw      = require("eastasianwidth");
-const argv     = require("minimist")(process.argv.slice(2), {
-  alias: {
-    l: "line",
-    h: "help",
-    r: "rainbow",
-    i: "interval",
-    w: "width"
-  },
-  default: {
-    interval: 100
+const c256 = require("ansi-256-colors");
+
+// TODO banner/message
+// TODO clear/reset
+
+
+class KaitenSushi {
+
+  constructor(options) {
+    this.resize(options.width, options.height);
+
+    this.neta = options.neta || "🍣🐟🐚";
+    this.rainbow = options.rainbow || false;
+    this.c256 = options.c256;
+
+    this.conveyor = [];
+    this.queue = [];
+
+    this.rainbowColor = [31, 32, 33, 34, 35, 36];
+    this.rainbowPos = 0;
+
+    this.gradient = {
+      r: 3, g: 3, b:3
+    };
   }
-});
 
 
-const main = () => {
-  const w = argv.width || ((process.stdout.columns / 2|0) - 2);
-  const h = argv.line || 8;
-  const sushi = "🍣";
-  const pad = "  ";
-  let conveyor = [];
+  getGradientColor() {
+    const t = (n) => {
+      let r = Math.random() * 2|0;
 
-  const rainbow = [31, 32, 33, 34, 35, 36];
-  let rainbowPos = 0;
+      if(n <= 1){
+        n += 1;
+      }
+      else if(n >= 4){
+        n -= 1;
+      }
+      else{
+        n += (r ? 1 : -1);
+      }
+      return n;
+    };
 
-  let c256 = 0;
+    let d = Math.random() * 3|0;
 
-  const kaiten = (neta) => {
+    (d === 0) && (this.gradient.r = t(this.gradient.r));
+    (d === 1) && (this.gradient.g = t(this.gradient.g));
+    (d === 2) && (this.gradient.b = t(this.gradient.b));
 
+    return c256.fg.getRgb(this.gradient.r, this.gradient.g, this.gradient.b);
+  }
+
+
+  _add(neta) {
     try{
 
       [...neta].forEach((c) => {
@@ -46,107 +69,108 @@ const main = () => {
           c += " ";
         }
 
-        if(argv["256"]){
-          conveyor.unshift(`\x1b[38;5;${
-            255 < c256 ? (c256 = 0) : ++c256
-          }m${c}\x1b[39m`);
+        if(this.c256){
+          c = `${this.getGradientColor()}${c}${c256.reset}`;
         }
-        else if(argv.rainbow){
-          conveyor.unshift(`\x1b[${
-            rainbow[
-              (rainbow.length <= ++rainbowPos) ? (rainbowPos = 0) : rainbowPos
+        if(this.rainbow){
+          c = `\x1b[${
+            this.rainbowColor[
+              (this.rainbowColor.length <= ++this.rainbowPos) ? (this.rainbowPos = 0) : this.rainbowPos
             ]
-          }m${c}\x1b[39m`);
-        }
-        else{
-          conveyor.unshift(c);
+          }m${c}\x1b[39m`;
         }
 
+
+        this.conveyor.unshift(c);
       });
 
     }catch(e){
-      conveyor.unshift(null);
+      this.conveyor.unshift(null);
     }
 
+    return this;
+  }
 
-    process.stdout.write(pad);
+
+  add(neta) {
+    [...neta].forEach(c => this.queue.push(c) );
+  }
+
+
+  rotation() {
+    return this.kaiten();
+  }
+
+
+  kaiten() {
+    let neta;
+
+    if(this.queue.length){
+      neta = this.queue.shift();
+    }
+    else{
+      let netas = [...this.neta];
+
+      neta = ((Math.random() * 3|0) < 1) ? null : netas[Math.random() * netas.length|0];
+    }
+
+    this._add(neta);
+
+    return this.frame();
+  }
+
+
+  frame() {
+    return this.get().join("\n");
+  }
+
+
+  get() {
+    let line = [];
+    let top = "";
+    let bottom = "";
+    const pad = "  ";
+    const w = this.width;
+    const h = this.height - 2;
+    const conveyor = this.conveyor;
+
+    top += pad;
     for(let i = 0;i < w;i++){
-      process.stdout.write(conveyor[i] || pad);
+      top += conveyor[i] || pad;
     }
-    process.stdout.write("\n");
+    line[0] = top;
 
     let margin = new Array(2 * w + 1).join(" ");
     for(let i = 0;i < h;i++){
       let left = (conveyor[(2 * w) + (2 * h) - i - 1] || pad);
       let right = (conveyor[w + i] || pad);
-      process.stdout.write(left + margin + right + "\n");
+      line.push(left + margin + right);
     }
 
-    process.stdout.write(pad);
+    bottom += pad;
     for(let i = 0;i < w;i++){
-      process.stdout.write(conveyor[(2 * w) + h - i - 1] || pad);
+      bottom += conveyor[(2 * w) + h - i - 1] || pad;
     }
-    process.stdout.write("\n");
+    line.push(bottom);
 
-    if(conveyor.length >= w * 2 + h * 2){
-      conveyor.pop();
-    }
-
+    return line;
   }
 
 
-  const frame = () => {
-    process.stdout.write(ansi.cursorUp(h + 2));
-    kaiten(((Math.random() * 3|0) < 1) ? null : sushi);
-
-    let interval = +argv.interval;
-    if(interval < 10){
-      interval = 10;
+  resize(width, height) {
+    this.width = width || ((process.stdout.columns / 2|0) - 2);
+    if(this.width < 1){
+      this.width = 1;
     }
 
-    setTimeout(frame, interval);
-  };
-
-  let text = "" + (argv._[0] || "寿司sushi🍣🐟");
-
-  process.stdout.write(ansi.cursorHide);
-  kaiten(text);
-  frame();
-};
-
-if(argv.help){
-  console.log(`
-    Usage: $ kaiten-sushi <message>
-
-    Options:
-      -l, --line <height>:
-      -w, --width <width>:
-      -i, --interval <msec>:
-      -r, --rainbow: rainbow
-      --256:
-  `);
-  process.exit();
-}
-
-
-readline.emitKeypressEvents(process.stdin);
-process.stdin.setRawMode(true);
-
-const restore = () => {
-  process.stdout.write(ansi.cursorShow);
-}
-
-process
-.on("exit", restore)
-.on("SIGTERM", () => {
-  restore();
-  process.exit();
-});
-
-process.stdin.on("keypress", (seq, key) => {
-  if(key.ctrl && (key.name === "d" || key.name === "c")){
-    process.exit();
+    this.height = height || process.stdout.rows - 1;
+    if(this.height < 2){
+      this.height = 2;
+    }
   }
-});
 
-main();
+}
+
+
+
+module.exports = KaitenSushi;
